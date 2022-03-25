@@ -14,16 +14,16 @@ LCD::LCD(uint d4, uint d5, uint d6, uint d7, uint en, uint rs, uint v0)
     this->_v0Pin = v0;
 
     gpio_init(this->_d4Pin);
-    gpio_set_dir(this->_d4Pin, GPIO_OUT);
     gpio_init(this->_d5Pin);
-    gpio_set_dir(this->_d5Pin, GPIO_OUT);
     gpio_init(this->_d6Pin);
-    gpio_set_dir(this->_d6Pin, GPIO_OUT);
     gpio_init(this->_d7Pin);
-    gpio_set_dir(this->_d7Pin, GPIO_OUT);
     gpio_init(this->_enPin);
-    gpio_set_dir(this->_enPin, GPIO_OUT);
     gpio_init(this->_rsPin);
+    gpio_set_dir(this->_d4Pin, GPIO_OUT);
+    gpio_set_dir(this->_d5Pin, GPIO_OUT);
+    gpio_set_dir(this->_d6Pin, GPIO_OUT);
+    gpio_set_dir(this->_d7Pin, GPIO_OUT);
+    gpio_set_dir(this->_enPin, GPIO_OUT);
     gpio_set_dir(this->_rsPin, GPIO_OUT);
 
     // V0 PWM signal
