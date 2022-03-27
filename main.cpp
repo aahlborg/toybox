@@ -36,7 +36,7 @@ int main(void)
 
     for (uint i = 0; true; i++)
     {
-        sleep_ms(1000);
+        sleep_ms(100);
         printf("Hej\n");
 
         char buf[100];

@@ -1,18 +1,22 @@
 #ifndef RGBLED_H
 #define RGBLED_H
 
-#include <pico/types.h>
+#include "Driver.h"
 
-class RgbLed
+class RgbLed : Driver
 {
 public:
-    explicit RgbLed(uint redPin, uint greenPin, uint bluePin);
-    void set_color(uint red, uint green, uint blue);
+    explicit RgbLed(int redPin, int greenPin, int bluePin);
+    void set_color(int red, int green, int blue);
 
 private:
-    uint _redPin;
-    uint _greenPin;
-    uint _bluePin;
+    const int redPin() { return this->pin(RgbLed::_redIdx); }
+    const int greenPin() { return this->pin(RgbLed::_greenIdx); }
+    const int bluePin() { return this->pin(RgbLed::_blueIdx); }
+
+    static constexpr int _redIdx = 0;
+    static constexpr int _greenIdx = 1;
+    static constexpr int _blueIdx = 2;
 };
 
 #endif // RGBLED_H
