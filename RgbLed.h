@@ -10,9 +10,9 @@ public:
     void set_color(int red, int green, int blue);
 
 private:
-    const int redPin() { return this->pin(RgbLed::_redIdx); }
-    const int greenPin() { return this->pin(RgbLed::_greenIdx); }
-    const int bluePin() { return this->pin(RgbLed::_blueIdx); }
+    const Pin& redPin() { return this->pin(RgbLed::_redIdx); }
+    const Pin& greenPin() { return this->pin(RgbLed::_greenIdx); }
+    const Pin& bluePin() { return this->pin(RgbLed::_blueIdx); }
 
     static constexpr int _redIdx = 0;
     static constexpr int _greenIdx = 1;

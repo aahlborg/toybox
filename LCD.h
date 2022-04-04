@@ -14,13 +14,13 @@ public:
     void set_contrast(int val);
 
 private:
-    const int d4Pin() { return this->pin(LCD::_d4Idx); }
-    const int d5Pin() { return this->pin(LCD::_d5Idx); }
-    const int d6Pin() { return this->pin(LCD::_d6Idx); }
-    const int d7Pin() { return this->pin(LCD::_d7Idx); }
-    const int enPin() { return this->pin(LCD::_enIdx); }
-    const int rsPin() { return this->pin(LCD::_rsIdx); }
-    const int v0Pin() { return this->pin(LCD::_v0Idx); }
+    const Pin& d4Pin() { return this->pin(LCD::_d4Idx); }
+    const Pin& d5Pin() { return this->pin(LCD::_d5Idx); }
+    const Pin& d6Pin() { return this->pin(LCD::_d6Idx); }
+    const Pin& d7Pin() { return this->pin(LCD::_d7Idx); }
+    const Pin& enPin() { return this->pin(LCD::_enIdx); }
+    const Pin& rsPin() { return this->pin(LCD::_rsIdx); }
+    const Pin& v0Pin() { return this->pin(LCD::_v0Idx); }
     void pulse(void);
     void send4(uint8_t data);
     void send8(uint8_t data);

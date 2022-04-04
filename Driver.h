@@ -2,17 +2,18 @@
 #define DRIVER_H
 
 #include <vector>
+#include "Pin.h"
 
 class Driver
 {
 protected:
-    Driver(std::vector<int> pins) :
+    Driver(std::vector<Pin> pins) :
         _pins(pins)
     {}
-    int pin(int index) { return this->_pins.at(index); }
+    const Pin& pin(int index) const { return this->_pins[index]; }
 
 private:
-    const std::vector<int> _pins;
+    const std::vector<Pin> _pins;
 };
 
 #endif // DRIVER_H
