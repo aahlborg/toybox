@@ -12,7 +12,8 @@ pico_sdk_init()
 add_executable(${PROJECT_NAME}
                main.cpp
                LCD.cpp
-               RgbLed.cpp)
+               RgbLed.cpp
+               Sonar.cpp)
 
 pico_add_extra_outputs(${PROJECT_NAME})
 

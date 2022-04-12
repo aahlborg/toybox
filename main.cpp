@@ -1,49 +1,69 @@
-#include <stdio.h>
+#include <iostream>
 #include <pico/stdlib.h>
 #include "LCD.h"
 #include "RgbLed.h"
+#include "Sonar.h"
 
-#define D4_PIN (21u)
-#define D5_PIN (20u)
-#define D6_PIN (19u)
-#define D7_PIN (18u)
-#define EN_PIN (16u)
-#define RS_PIN (17u)
-#define V0_PIN (22u)
+static constexpr int lcdD4Pin = 21;
+static constexpr int lcdD5Pin = 20;
+static constexpr int lcdD6Pin = 19;
+static constexpr int lcdD7Pin = 18;
+static constexpr int lcdEnPin = 16;
+static constexpr int lcdRsPin = 17;
+static constexpr int lcdV0Pin = 22;
 
-#define RED_PIN (11u)
-#define GREEN_PIN (12u)
-#define BLUE_PIN (13u)
+static constexpr int ledRedPin = 11;
+static constexpr int ledGreenPin = 12;
+static constexpr int ledBluePin = 13;
+
+static constexpr int sonarTrigPin = 26;
+static constexpr int sonarEchoPin = 27;
+
+using std::cout;
+using std::endl;
 
 int main(void)
 {
     stdio_init_all();
-    printf("Starting\n");
+    cout << "Starting" << endl;
 
-    LCD _lcd(D4_PIN,
-             D5_PIN,
-             D6_PIN,
-             D7_PIN,
-             EN_PIN,
-             RS_PIN,
-             V0_PIN);
+    LCD _lcd(lcdD4Pin,
+             lcdD5Pin,
+             lcdD6Pin,
+             lcdD7Pin,
+             lcdEnPin,
+             lcdRsPin,
+             lcdV0Pin);
     _lcd.init();
     _lcd.set_contrast(25);
 
-    RgbLed _rgbLed(RED_PIN,
-                   GREEN_PIN,
-                   BLUE_PIN);
+    RgbLed _rgbLed(ledRedPin,
+                   ledGreenPin,
+                   ledBluePin);
 
-    for (uint i = 0; true; i++)
+    Sonar _sonar(sonarTrigPin,
+                 sonarEchoPin);
+
+    for (int i = 0; true; i++)
     {
         sleep_ms(100);
-        printf("Hej\n");
+        cout << "Hej " << i << endl;
 
-        char buf[100];
-        sprintf(buf, "Hello %u", i);
+        _sonar.startMeasurement();
         _lcd.clear();
-        _lcd.print(buf);
-
-        _rgbLed.set_color(i % 100, (i + 33) % 100, (i + 66) % 100);
+        char str[32];
+        int distance = _sonar.getMeasurementMm();
+        if (distance < 1000)
+        {
+            snprintf(str, 32, "%u cm", distance / 10);
+            int level = distance * distance / 10000;
+            _rgbLed.set_color(level, level, level);
+        }
+        else
+        {
+            snprintf(str, 32, "-- cm");
+            _rgbLed.set_color(0, 0, 0);
+        }
+        _lcd.print(str);
     }
 }
