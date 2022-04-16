@@ -6,6 +6,9 @@
 #include <map>
 #include <functional>
 
+
+using IsrCallback_t = std::function<void(int, uint32_t)>;
+
 enum PinFunction
 {
     FN_OUTPUT,
@@ -20,51 +23,36 @@ struct PwmParams
     float clock_divider;
 };
 
-struct InputIsrParams
-{
-    std::function<void(uint32_t)> callback;
-    uint32_t events;
-};
-
 // GPIO ISR callback function
 void isr_callback(uint gpio, uint32_t events);
+
 
 class Pin
 {
 public:
     Pin(int pin, PinFunction function);
     Pin(int pin, PinFunction function, PwmParams pwmParams);
-    Pin(int pin, PinFunction function, std::function<void(uint32_t)> callback, uint32_t events);
+    Pin(int pin, PinFunction function, uint32_t events);
+    ~Pin();
 
-    ~Pin()
+    void setCallback(IsrCallback_t callback) const
     {
-        // Remove callback references
-        Pin::callbackMap.erase(this->_pin);
-    }
-
-    // TODO: Violates constness since Pin is reconfigured
-    void setCallback(std::function<void(uint32_t)> callback, uint32_t events) const
-    {
-        // Only valid for INPUT
-        assert(this->_function == FN_INPUT);
+        assert(this->_function == FN_INPUT_ISR);
         Pin::callbackMap[this->_pin] = callback;
-        gpio_set_irq_enabled_with_callback(this->_pin,
-                                           events,
-                                           true,
-                                           &isr_callback);
     }
 
     int pin() const { return this->_pin; }
+    PinFunction function() const { return this->_function; }
     void set(int value) const { gpio_put(this->_pin, value); }
     void set_duty(int value) const { pwm_set_gpio_level(this->_pin, value); }
+    bool get() const { return gpio_get(this->_pin); }
 
-    static std::map<int, std::function<void(uint32_t)>> callbackMap;
+    static std::map<int, IsrCallback_t> callbackMap;
 
 private:
     const int _pin;
     const PinFunction _function;
     const PwmParams _pwmParams;
-    const InputIsrParams _isrParams;
 };
 
 #endif // PIN_H

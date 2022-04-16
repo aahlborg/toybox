@@ -8,7 +8,7 @@ class Sonar : Driver
 public:
     explicit Sonar(int trigPin, int echoPin);
 
-    void callbackHandler(uint32_t events);
+    void callbackHandler(int gpio, uint32_t events);
     void startMeasurement();
     int getMeasurementMm();
 
