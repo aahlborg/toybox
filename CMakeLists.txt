@@ -11,6 +11,7 @@ pico_sdk_init()
 
 add_executable(${PROJECT_NAME}
                main.cpp
+               Pin.cpp
                LCD.cpp
                RgbLed.cpp
                Sonar.cpp)

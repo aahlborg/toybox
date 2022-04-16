@@ -1,29 +1,20 @@
 #include "Sonar.h"
 #include <pico/stdlib.h>
+#include <functional>
 
-
-std::map<int, Sonar*> Sonar::_callback_map;
 static constexpr int speedOfSound = 343;
-
-void echo_cb(uint gpio, uint32_t events)
-{
-    Sonar::_callback_map.at(gpio)->callbackHandler(events);
-}
 
 Sonar::Sonar(int trigPin, int echoPin) :
     Driver({Pin(trigPin, FN_OUTPUT),
-            Pin(echoPin, FN_INPUT, {.callback = echo_cb, .events = GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE})}),
+            Pin(echoPin, FN_INPUT, std::bind(&Sonar::callbackHandler, this, std::placeholders::_1), GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE)}),
     _measuring(false),
     _echo_high(false),
     _echo_start_us(0),
     _last_echo_duration(0)
 {
-    Sonar::_callback_map[this->echoPin().pin()] = this;
-}
-
-Sonar::~Sonar()
-{
-    Sonar::_callback_map.erase(this->echoPin().pin());
+    auto cb = std::bind(&Sonar::callbackHandler, this, std::placeholders::_1);
+    //auto cb = [this](uint32_t events){callbackHandler(events);};
+    this->echoPin().setCallback(cb, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE);
 }
 
 void Sonar::callbackHandler(uint32_t events)

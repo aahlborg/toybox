@@ -3,12 +3,15 @@
 
 #include <pico/stdlib.h>
 #include <hardware/pwm.h>
+#include <map>
+#include <functional>
 
 enum PinFunction
 {
     FN_OUTPUT,
     FN_PWM,
     FN_INPUT,
+    FN_INPUT_ISR,
 };
 
 struct PwmParams
@@ -19,70 +22,43 @@ struct PwmParams
 
 struct InputIsrParams
 {
-    void (*callback)(uint gpio, uint32_t events);
+    std::function<void(uint32_t)> callback;
     uint32_t events;
 };
+
+// GPIO ISR callback function
+void isr_callback(uint gpio, uint32_t events);
 
 class Pin
 {
 public:
-    Pin(int pin, PinFunction function) :
-        _pin(pin),
-        _function(function),
-        _pwmParams(),
-        _isrParams()
+    Pin(int pin, PinFunction function);
+    Pin(int pin, PinFunction function, PwmParams pwmParams);
+    Pin(int pin, PinFunction function, std::function<void(uint32_t)> callback, uint32_t events);
+
+    ~Pin()
     {
-        switch (function)
-        {
-        case FN_OUTPUT:
-            gpio_init(pin);
-            gpio_set_dir(pin, GPIO_OUT);
-            break;
-        case FN_PWM:
-            gpio_set_function(pin, GPIO_FUNC_PWM);
-            pwm_set_enabled(pwm_gpio_to_slice_num(pin), true);
-            break;
-        case FN_INPUT:
-            gpio_init(pin);
-            gpio_set_dir(pin, GPIO_IN);
-            break;
-        default:
-            assert(false);
-        }
+        // Remove callback references
+        Pin::callbackMap.erase(this->_pin);
     }
 
-    Pin(int pin, PinFunction function, PwmParams pwmParams) :
-        _pin(pin),
-        _function(function),
-        _pwmParams(pwmParams),
-        _isrParams()
-    {
-        // Only valid for PWM
-        assert(FN_PWM == function);
-        gpio_set_function(pin, GPIO_FUNC_PWM);
-        pwm_set_wrap(pwm_gpio_to_slice_num(pin), pwmParams.wrap_value);
-        pwm_set_clkdiv(pwm_gpio_to_slice_num(pin), pwmParams.clock_divider);
-        pwm_set_enabled(pwm_gpio_to_slice_num(pin), true);
-    }
-
-    Pin(int pin, PinFunction function, InputIsrParams isrParams) :
-        _pin(pin),
-        _function(function),
-        _pwmParams(),
-        _isrParams(isrParams)
+    // TODO: Violates constness since Pin is reconfigured
+    void setCallback(std::function<void(uint32_t)> callback, uint32_t events) const
     {
         // Only valid for INPUT
-        assert(FN_INPUT == function);
-        gpio_init(pin);
-        gpio_set_irq_enabled_with_callback(pin,
-                                           isrParams.events,
+        assert(this->_function == FN_INPUT);
+        Pin::callbackMap[this->_pin] = callback;
+        gpio_set_irq_enabled_with_callback(this->_pin,
+                                           events,
                                            true,
-                                           isrParams.callback);
+                                           &isr_callback);
     }
 
     int pin() const { return this->_pin; }
     void set(int value) const { gpio_put(this->_pin, value); }
     void set_duty(int value) const { pwm_set_gpio_level(this->_pin, value); }
+
+    static std::map<int, std::function<void(uint32_t)>> callbackMap;
 
 private:
     const int _pin;
