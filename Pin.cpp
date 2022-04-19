@@ -4,8 +4,9 @@
 // Maps pins to callback functions
 std::map<int, IsrCallback_t> Pin::callbackMap;
 
-// Global ISR callback router
-void isr_callback(uint gpio, uint32_t events)
+// GPIO ISR callback function
+static void isr_callback(uint gpio, uint32_t events);
+static void isr_callback(uint gpio, uint32_t events)
 {
     if (Pin::callbackMap.count(gpio) != 0)
     {

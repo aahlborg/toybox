@@ -8,11 +8,11 @@ class Sonar : Driver
 public:
     explicit Sonar(int trigPin, int echoPin);
 
-    void callbackHandler(int gpio, uint32_t events);
     void startMeasurement();
     int getMeasurementMm();
 
 private:
+    void callbackHandler(int gpio, uint32_t events);
     const Pin& trigPin() { return this->pin(Sonar::_trigIdx); }
     const Pin& echoPin() { return this->pin(Sonar::_echoIdx); }
 

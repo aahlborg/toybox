@@ -23,9 +23,6 @@ struct PwmParams
     float clock_divider;
 };
 
-// GPIO ISR callback function
-void isr_callback(uint gpio, uint32_t events);
-
 
 class Pin
 {

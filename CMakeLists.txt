@@ -14,7 +14,9 @@ add_executable(${PROJECT_NAME}
                Pin.cpp
                LCD.cpp
                RgbLed.cpp
-               Sonar.cpp)
+               Sonar.cpp
+               RotaryEncoder.cpp
+)
 
 pico_add_extra_outputs(${PROJECT_NAME})
 

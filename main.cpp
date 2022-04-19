@@ -3,6 +3,7 @@
 #include "LCD.h"
 #include "RgbLed.h"
 #include "Sonar.h"
+#include "RotaryEncoder.h"
 
 static constexpr int lcdD4Pin = 21;
 static constexpr int lcdD5Pin = 20;
@@ -18,6 +19,10 @@ static constexpr int ledBluePin = 13;
 
 static constexpr int sonarTrigPin = 26;
 static constexpr int sonarEchoPin = 27;
+
+static constexpr int knobAPin = 14;
+static constexpr int knobBPin = 15;
+static constexpr int knobSwPin = 10;
 
 using std::cout;
 using std::endl;
@@ -43,6 +48,10 @@ int main(void)
 
     Sonar _sonar(sonarTrigPin,
                  sonarEchoPin);
+    
+    RotaryEncoder _knob(knobAPin,
+                        knobBPin,
+                        knobSwPin);
 
     for (int i = 0; true; i++)
     {
@@ -53,15 +62,16 @@ int main(void)
         _lcd.clear();
         char str[32];
         int distance = _sonar.getMeasurementMm();
+        int knobPos = _knob.position();
         if (distance < 1000)
         {
-            snprintf(str, 32, "%u cm", distance / 10);
+            snprintf(str, 32, "%u cm %u", distance / 10, knobPos);
             int level = distance * distance / 10000;
             _rgbLed.set_color(level, level, level);
         }
         else
         {
-            snprintf(str, 32, "-- cm");
+            snprintf(str, 32, "-- cm %u", knobPos);
             _rgbLed.set_color(0, 0, 0);
         }
         _lcd.print(str);
