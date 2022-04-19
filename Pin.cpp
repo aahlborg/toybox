@@ -70,7 +70,7 @@ Pin::Pin(int pin, PinFunction function, uint32_t events) :
 // Disable gpio
 Pin::~Pin()
 {
-    if (FN_INPUT_ISR == this->_function)
+    /*if (FN_INPUT_ISR == this->_function)
     {
         // Disable ISR
         gpio_set_irq_enabled(this->_pin, 0, false);
@@ -84,5 +84,5 @@ Pin::~Pin()
     }
     // Disable I/O
     gpio_set_dir(this->_pin, GPIO_IN);
-    gpio_set_input_enabled(this->_pin, false);
+    gpio_set_input_enabled(this->_pin, false);*/
 }
